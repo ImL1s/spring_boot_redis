@@ -3,6 +3,7 @@ package com.iml1s.spring.redis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -54,5 +55,25 @@ public class RedisController {
         HashMap map = new HashMap<String, Object>();
         map.put("success", true);
         return map;
+    }
+
+
+    @RequestMapping("/list")
+    @ResponseBody
+    public Map<String, Object> testList() {
+        stringRedisTemplate.opsForList().leftPushAll(
+                "list1", "v1", "v2", "v3", "v4", "v5"
+        );
+
+        stringRedisTemplate.opsForList().rightPushAll(
+                "list2", "v1", "v2", "v3", "v4", "v5"
+        );
+
+        BoundListOperations listOperations = stringRedisTemplate.boundListOps("list2");
+
+        HashMap map = new HashMap<String, Object>();
+        map.put("success", true);
+        return map;
+
     }
 }
