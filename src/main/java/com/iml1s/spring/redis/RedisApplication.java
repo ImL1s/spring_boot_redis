@@ -1,6 +1,7 @@
 package com.iml1s.spring.redis;
 
 import com.iml1s.spring.redis.config.RedisConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -14,28 +15,45 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import javax.annotation.PostConstruct;
 import java.applet.AppletContext;
 
 @SpringBootApplication
 public class RedisApplication {
 
+    @Autowired
+    private RedisTemplate redisTemplate = null;
+
     public static void main(String[] args) {
         SpringApplication.run(RedisApplication.class, args);
 
-        ApplicationContext context = new AnnotationConfigApplicationContext(RedisConfig.class);
+//        ApplicationContext context = new AnnotationConfigApplicationContext(RedisConfig.class);
+//
+//        // 使用Redis Template
+//        useRedisTemplate(context);
+//
+//        // 直接使Redis Connection factory
+//        useRedisConnectionFactory(context);
+//
+//        // 使用Redis Callback節省連接(較底層,不好用)
+//        useRedisCallback(context);
+//
+//        // 使用Session Callback節省連接(推薦使用)
+//        useSessionCallback(context);
 
-        // 使用Redis Template
-        useRedisTemplate(context);
+    }
 
-        // 直接使Redis Connection factory
-        useRedisConnectionFactory(context);
 
-        // 使用Redis Callback節省連接(較底層,不好用)
-        useRedisCallback(context);
+    @PostConstruct
+    public void init() {
+        initRedisTemplate();
+    }
 
-        // 使用Session Callback節省連接(推薦使用)
-        useSessionCallback(context);
-
+    private void initRedisTemplate() {
+        RedisSerializer serializer = redisTemplate.getStringSerializer();
+        redisTemplate.setKeySerializer(serializer);
+        redisTemplate.setHashKeySerializer(serializer);
+        redisTemplate.opsForValue().set("initRedisTemplate", "OK".getBytes());
     }
 
     private static void useSessionCallback(ApplicationContext context) {
